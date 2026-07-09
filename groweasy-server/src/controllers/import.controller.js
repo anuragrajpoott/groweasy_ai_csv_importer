@@ -4,6 +4,11 @@ const { getColumnMapping } = require("../services/mapping.service");
 const cleanJson = require("../utils/cleanJson");
 const transformRows = require("../utils/transformRows");
 
+const {
+  getFallbackMapping,
+  isWeakMapping,
+} = require("../utils/fallbackMapping");
+
 const importCSV = async (req, res) => {
   try {
     const file = req.file;
@@ -35,10 +40,37 @@ const importCSV = async (req, res) => {
       await getColumnMapping(headers);
 
     const cleaned =
-      cleanJson(mappingResponse);
+  cleanJson(mappingResponse);
 
-    const mapping =
-      JSON.parse(cleaned);
+let mapping;
+
+try {
+  mapping = JSON.parse(cleaned);
+} catch (error) {
+  return res.status(500).json({
+    success: false,
+    message: "AI returned invalid mapping",
+  });
+}
+
+if (
+  !mapping ||
+  typeof mapping !== "object" ||
+  Array.isArray(mapping)
+) {
+  return res.status(500).json({
+    success: false,
+    message: "Invalid mapping format received",
+  });
+}
+
+if (isWeakMapping(mapping)) {
+  console.log(
+    "AI mapping weak, using fallback mapping"
+  );
+
+  mapping = getFallbackMapping(headers);
+}
 
     const result = transformRows(
       parsed.data,

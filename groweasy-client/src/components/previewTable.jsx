@@ -7,7 +7,7 @@ function PreviewTable({ data }) {
 
   return (
     <div className="border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm">
-      <div className="overflow-auto max-h-[400px]">
+      <div className="overflow-auto max-h-100">
         <table className="w-full text-sm">
           <thead className="sticky top-0 bg-gray-50 border-b">
             <tr>
