@@ -4,7 +4,11 @@ import Papa from "papaparse";
 import UploadZone from "./components/UploadZone";
 import PreviewTable from "./components/PreviewTable";
 
+import api from "./services/api";
+
 function App() {
+  const [result, setResult] = useState(null);
+
   const [file, setFile] = useState(null);
   const [csvData, setCsvData] = useState([]);
 
@@ -29,24 +33,30 @@ function App() {
     });
   };
 
-
   const handleImport = async () => {
-  try {
-    setIsImporting(true);
+    try {
+      setIsImporting(true);
 
-    // Backend API call will go here later
+      const formData = new FormData();
 
-    await new Promise((resolve) =>
-      setTimeout(resolve, 2000)
-    );
+      formData.append("file", file);
 
-    alert("Import started successfully");
-  } catch (error) {
-    console.error(error);
-  } finally {
-    setIsImporting(false);
-  }
-};
+      const response = await api.post("/import", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      setResult(response.data);
+
+      console.log(response.data);
+    } catch (error) {
+      console.error(error);
+      alert("Import failed");
+    } finally {
+      setIsImporting(false);
+    }
+  };
 
   return (
     <div
@@ -77,28 +87,46 @@ function App() {
           <PreviewTable data={csvData.slice(0, 20)} />
 
           <div
-  style={{
-    marginTop: "20px",
-  }}
->
-  <button
-    onClick={handleImport}
-    disabled={isImporting}
-    style={{
-      padding: "12px 24px",
-      border: "none",
-      borderRadius: "8px",
-      background: "#2563eb",
-      color: "white",
-      cursor: "pointer",
-      fontSize: "16px",
-    }}
-  >
-    {isImporting
-      ? "Processing..."
-      : "Confirm Import"}
-  </button>
-</div>
+            style={{
+              marginTop: "20px",
+            }}
+          >
+            <button
+              onClick={handleImport}
+              disabled={isImporting}
+              style={{
+                padding: "12px 24px",
+                border: "none",
+                borderRadius: "8px",
+                background: "#2563eb",
+                color: "white",
+                cursor: "pointer",
+                fontSize: "16px",
+              }}
+            >
+              {isImporting ? "Processing..." : "Confirm Import"}
+            </button>
+
+            {result && (
+              <div
+                style={{
+                  marginTop: "30px",
+                  padding: "20px",
+                  background: "white",
+                  border: "1px solid #ddd",
+                }}
+              >
+                <h3>Backend Response</h3>
+
+                <p>
+                  Total Rows:
+                  {result.totalRows}
+                </p>
+
+                <pre>{JSON.stringify(result.preview, null, 2)}</pre>
+              </div>
+            )}
+          </div>
         </>
       )}
     </div>
