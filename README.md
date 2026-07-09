@@ -516,15 +516,15 @@ Handles:
 
 Frontend:
 
-[<Client>](https://groweasy-ai-csv-importer-red.vercel.app/)
+https://groweasy-ai-csv-importer-red.vercel.app/
 
 Backend:
 
-[<Server>](https://groweasy-ai-csv-importer-ni7u.onrender.com)
+https://groweasy-ai-csv-importer-ni7u.onrender.com
 
 GitHub Repository:
 
-[<GitHub>](https://github.com/anuragrajpoott/groweasy_ai_csv_importer)
+https://github.com/anuragrajpoott/groweasy_ai_csv_importer
 
 ---
 
