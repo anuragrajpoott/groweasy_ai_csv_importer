@@ -10,10 +10,10 @@ This application allows users to upload CSV files, preview records, automaticall
 
 ### CSV Upload
 
-- Drag & Drop CSV Upload
-- File Browser Upload
-- CSV Validation
-- Preview Before Import
+* Drag & Drop CSV Upload
+* File Browser Upload
+* CSV Validation
+* Preview Before Import
 
 ### AI-Powered Column Mapping
 
@@ -21,12 +21,12 @@ Uses OpenRouter AI to automatically map CSV headers to CRM fields.
 
 Example:
 
-| CSV Header | CRM Field |
-|------------|------------|
-| Prospect Name | name |
+| CSV Header    | CRM Field                   |
+| ------------- | --------------------------- |
+| Prospect Name | name                        |
 | Mobile Number | mobile_without_country_code |
-| Organization | company |
-| Remarks | crm_note |
+| Organization  | company                     |
+| Remarks       | crm_note                    |
 
 ---
 
@@ -36,12 +36,17 @@ Transforms CSV rows into CRM-compatible records.
 
 Supports:
 
-- Name Mapping
-- Email Mapping
-- Phone Mapping
-- Notes Mapping
-- Company Mapping
-- Status Mapping
+* Name Mapping
+* Email Mapping
+* Phone Mapping
+* Company Mapping
+* City, State, Country Mapping
+* Lead Owner Mapping
+* CRM Status Normalization
+* CRM Notes Generation
+* Multiple Email Handling
+* Multiple Phone Number Handling
+* Country Code Extraction
 
 ---
 
@@ -65,11 +70,11 @@ Record will be skipped.
 
 Displays:
 
-- Total Imported
-- Total Skipped
-- Detected Mapping
-- Imported Records
-- Skipped Records
+* Total Imported
+* Total Skipped
+* Detected Mapping
+* Imported Records
+* Skipped Records
 
 ---
 
@@ -77,17 +82,22 @@ Displays:
 
 Built using:
 
-- React
-- Tailwind CSS
+* React
+* Tailwind CSS
 
 Features:
 
-- SaaS-style interface
-- Responsive layout
-- CSV Preview Table
-- Mapping Table
-- Result Tables
-- Success Banner
+* SaaS-style interface
+* Responsive layout
+* CSV Preview Table
+* Mapping Table
+* Result Tables
+* Success Banner
+* Progress Indicator
+* Dark Mode
+* Theme Persistence
+* Sticky Table Headers
+* Responsive Scrolling Tables
 
 ---
 
@@ -107,6 +117,10 @@ AI Column Mapping
 (OpenRouter)
      │
      ▼
+Fallback Mapping
+(if AI mapping is weak)
+     │
+     ▼
 Transform Rows
 (Node.js)
      │
@@ -123,20 +137,20 @@ Frontend Results
 
 ### Frontend
 
-- React (Vite)
-- Tailwind CSS
-- Axios
-- React Dropzone
-- PapaParse
+* React (Vite)
+* Tailwind CSS v4
+* Axios
+* React Dropzone
+* PapaParse
 
 ### Backend
 
-- Node.js
-- Express.js
-- Multer
-- PapaParse
-- OpenAI SDK
-- OpenRouter AI
+* Node.js
+* Express.js
+* Multer
+* PapaParse
+* OpenAI SDK
+* OpenRouter AI
 
 ---
 
@@ -148,17 +162,24 @@ groweasy-csv-importer
 ├── groweasy-client
 │   ├── src
 │   │   ├── components
+│   │   │   ├── Navbar.jsx
+│   │   │   ├── Footer.jsx
+│   │   │   ├── ThemeToggle.jsx
 │   │   │   ├── UploadZone.jsx
 │   │   │   ├── PreviewTable.jsx
 │   │   │   ├── ResultTable.jsx
 │   │   │   ├── ImportCard.jsx
 │   │   │   └── ImportHeader.jsx
 │   │   │
+│   │   ├── context
+│   │   │   └── ThemeContext.jsx
+│   │   │
 │   │   ├── services
 │   │   │   └── api.js
 │   │   │
 │   │   ├── App.jsx
-│   │   └── main.jsx
+│   │   ├── main.jsx
+│   │   └── index.css
 │   │
 │   └── package.json
 │
@@ -171,6 +192,7 @@ groweasy-csv-importer
 │   │
 │   ├── utils
 │   │   ├── cleanJson.js
+│   │   ├── fallbackMapping.js
 │   │   └── transformRows.js
 │   │
 │   ├── routes
@@ -224,13 +246,106 @@ Example:
 
 Node.js transforms rows locally.
 
-This reduces:
+This approach reduces:
 
-- AI cost
-- AI latency
-- Token usage
+* AI cost
+* AI latency
+* Token usage
 
-while keeping mapping flexible.
+while keeping field mapping flexible and accurate.
+
+---
+
+## Fallback Mapping
+
+If AI returns an invalid or weak mapping, the application automatically falls back to rule-based header matching.
+
+Examples:
+
+```text
+Email → email
+E-mail → email
+Phone → mobile_without_country_code
+Mobile Number → mobile_without_country_code
+Full Name → name
+```
+
+This ensures imports continue even when AI responses are incomplete or invalid.
+
+---
+
+## Data Processing Features
+
+### Phone Number Handling
+
+Supports:
+
+```text
++91 9876543210
++919876543210
++1 5551234567
+9876543210
+```
+
+Extracts:
+
+```json
+{
+  "country_code": "+91",
+  "mobile_without_country_code": "9876543210"
+}
+```
+
+---
+
+### Multiple Emails
+
+Input:
+
+```text
+john@example.com;sales@example.com
+```
+
+Output:
+
+```text
+email = john@example.com
+
+crm_note =
+Additional emails: sales@example.com
+```
+
+---
+
+### Multiple Phone Numbers
+
+Input:
+
+```text
++91 9876543210;+91 9999999999
+```
+
+Output:
+
+```text
+mobile_without_country_code = 9876543210
+
+crm_note =
+Additional numbers: +91 9999999999
+```
+
+---
+
+### Status Normalization
+
+Supported mappings:
+
+| Input          | CRM Status          |
+| -------------- | ------------------- |
+| Interested     | GOOD_LEAD_FOLLOW_UP |
+| Busy           | DID_NOT_CONNECT     |
+| Not Interested | BAD_LEAD            |
+| Closed Won     | SALE_DONE           |
 
 ---
 
@@ -239,11 +354,11 @@ while keeping mapping flexible.
 ### Clone Repository
 
 ```bash
-git clone https://github.com/anuragrajpoott/groweasy_ai_csv_importer
+git clone https://github.com/anuragrajpoott/groweasy_ai_csv_importer.git
 ```
 
 ```bash
-cd groweasy-csv-importer
+cd groweasy_ai_csv_importer
 ```
 
 ---
@@ -352,12 +467,14 @@ Response:
 
 ## Assumptions
 
-- CSV contains a header row.
-- AI can identify common CRM-related fields.
-- At least one identifier exists:
-  - Email
-  - Mobile Number
-- Invalid records are skipped rather than imported.
+* CSV contains a header row.
+* AI can identify common CRM-related fields.
+* At least one identifier exists:
+
+  * Email
+  * Mobile Number
+* Invalid records are skipped rather than imported.
+* AI is used only for header mapping; record transformation is handled locally.
 
 ---
 
@@ -365,39 +482,74 @@ Response:
 
 Handles:
 
-- Missing CSV
-- Empty CSV
-- Invalid AI response
-- CSV parsing failures
-- Transformation failures
+* Missing CSV
+* Empty CSV
+* Invalid AI response
+* Weak AI mappings
+* Invalid mapping formats
+* Unsupported CRM fields
+* CSV parsing failures
+* Transformation failures
+
+---
+
+## Screenshots
+
+### Light Mode
+
+*Add screenshot here*
+
+### Dark Mode
+
+*Add screenshot here*
+
+### CSV Preview
+
+*Add screenshot here*
+
+### Import Results
+
+*Add screenshot here*
+
+---
+
+## Live Demo
+
+Frontend:
+
+<YOUR_FRONTEND_URL>
+
+Backend:
+
+<YOUR_BACKEND_URL>
+
+GitHub Repository:
+
+<YOUR_GITHUB_REPOSITORY_URL>
 
 ---
 
 ## Future Improvements
 
-- Manual Field Mapping UI
-- Mapping Confidence Scores
-- Dark Mode
-- Progress Indicator
-- Import History
-- Duplicate Detection
-- Bulk Validation Rules
-- Background Processing
-- User Authentication
-- Multi-CRM Support
+* Manual Field Mapping UI
+* Mapping Confidence Scores
+* Import History
+* Duplicate Detection
+* Bulk Validation Rules
+* Background Processing
+* User Authentication
+* Multi-CRM Support
 
 ---
 
 ## Author
 
-Built as part of the GrowEasy CSV Importer Assignment.
+Built as part of the GrowEasy Software Developer Assignment.
 
 Tech Stack:
 
-- React
-- Node.js
-- Express
-- OpenRouter AI
-- Tailwind CSS
-
----
+* React
+* Node.js
+* Express.js
+* OpenRouter AI
+* Tailwind CSS
