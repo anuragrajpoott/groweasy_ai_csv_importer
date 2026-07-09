@@ -15,6 +15,8 @@ function App() {
   const [result, setResult] = useState(null);
   const [isImporting, setIsImporting] = useState(false);
 
+  const [stage, setStage] = useState("");
+
   const handleFileSelect = (selectedFile) => {
     setFile(selectedFile);
     setResult(null);
@@ -34,9 +36,14 @@ function App() {
   const handleImport = async () => {
     try {
       setIsImporting(true);
+      setStage("Analyzing CSV...");
+
+      await new Promise((resolve) => setTimeout(resolve, 400));
 
       const formData = new FormData();
       formData.append("file", file);
+
+      setStage("Mapping Columns...");
 
       const response = await api.post("/import", formData, {
         headers: {
@@ -44,15 +51,24 @@ function App() {
         },
       });
 
+      setStage("Transforming Records...");
+
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
       setResult(response.data);
+
+      setStage("Complete");
     } catch (error) {
       console.error(error);
       alert("Import failed");
     } finally {
       setIsImporting(false);
+
+      setTimeout(() => {
+        setStage("");
+      }, 1500);
     }
   };
-
   const handleCancel = () => {
     setFile(null);
     setCsvData([]);
@@ -65,20 +81,18 @@ function App() {
 
       <div className="p-6">
         {/* Upload Area */}
-        {!file && (
-          <UploadZone onFileSelect={handleFileSelect} />
-        )}
+        {!file && <UploadZone onFileSelect={handleFileSelect} />}
 
         {/* Selected File */}
         {file && (
-          <div className="border rounded-xl p-4 bg-gray-50">
+          <div className="border border-gray-200 dark:border-gray-700 rounded-xl p-4 bg-gray-50 dark:bg-gray-800">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="font-semibold text-gray-800">
+                <h3 className="font-semibold text-gray-800 dark:text-white">
                   {file.name}
                 </h3>
 
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                   {(file.size / 1024).toFixed(2)} KB
                 </p>
               </div>
@@ -97,26 +111,52 @@ function App() {
         {csvData.length > 0 && (
           <>
             <div className="mt-6">
-              <h2 className="text-lg font-semibold mb-3">
+              <h2 className="text-lg font-semibold mb-3 text-gray-900 dark:text-white">
                 CSV Preview ({csvData.length} rows)
               </h2>
 
               <PreviewTable data={csvData.slice(0, 10)} />
             </div>
 
+            {isImporting && (
+              <div className="mt-6">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
+                    {stage}
+                  </span>
+                </div>
+
+                <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div
+                    className="
+          h-full
+          w-full
+          bg-orange-500
+          animate-pulse
+        "
+                  />
+                </div>
+              </div>
+            )}
+
             {/* Actions */}
             <div className="flex justify-end gap-4 mt-6">
               <button
                 onClick={handleCancel}
                 className="
-                  px-6
-                  py-3
-                  rounded-xl
-                  border
-                  border-gray-300
-                  bg-white
-                  hover:bg-gray-50
-                "
+  px-6
+  py-3
+  rounded-xl
+  border
+  border-gray-300
+  dark:border-gray-600
+  bg-white
+  dark:bg-gray-700
+  text-gray-700
+  dark:text-white
+  hover:bg-gray-50
+  dark:hover:bg-gray-600
+"
               >
                 Cancel
               </button>
@@ -134,9 +174,7 @@ function App() {
                   disabled:opacity-50
                 "
               >
-                {isImporting
-                  ? "Processing..."
-                  : "Upload File"}
+                {isImporting ? stage || "Processing..." : "Upload File"}
               </button>
             </div>
           </>
@@ -146,7 +184,7 @@ function App() {
         {result && (
           <div className="mt-10 space-y-8">
             {/* Success Banner */}
-            <div className="bg-green-50 border border-green-200 rounded-xl p-4">
+            <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-4">
               <h3 className="font-semibold text-green-700">
                 Import Completed Successfully
               </h3>
@@ -158,18 +196,16 @@ function App() {
 
             {/* Stats */}
             <div className="grid md:grid-cols-2 gap-4">
-              <div className="bg-green-50 border border-green-200 rounded-xl p-5">
-                <p className="text-sm text-gray-500">
-                  Successfully Imported
-                </p>
+              <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-5">
+                <p className="text-sm text-gray-500 dark:text-gray-400">Successfully Imported</p>
 
                 <h2 className="text-4xl font-bold text-green-600 mt-2">
                   {result.totalImported}
                 </h2>
               </div>
 
-              <div className="bg-red-50 border border-red-200 rounded-xl p-5">
-                <p className="text-sm text-gray-500">
+              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-5">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                   Skipped Records
                 </p>
 
@@ -181,40 +217,30 @@ function App() {
 
             {/* Mapping */}
             {result.mapping && (
-              <div className="bg-white border rounded-xl overflow-hidden">
+              <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
                 <div className="px-5 py-4 border-b">
-                  <h2 className="font-semibold">
+                  <h2 className="font-semibold text-gray-900 dark:text-white">
                     Detected Field Mapping
                   </h2>
                 </div>
 
                 <table className="w-full">
-                  <thead className="bg-gray-50">
+                  <thead className="bg-gray-50 dark:bg-gray-700">
                     <tr>
-                      <th className="text-left p-3">
-                        CSV Column
-                      </th>
+                      <th className="text-left p-3">CSV Column</th>
 
-                      <th className="text-left p-3">
-                        CRM Field
-                      </th>
+                      <th className="text-left p-3">CRM Field</th>
                     </tr>
                   </thead>
 
                   <tbody>
-                    {Object.entries(result.mapping).map(
-                      ([csv, crm]) => (
-                        <tr
-                          key={csv}
-                          className="border-t"
-                        >
-                          <td className="p-3">
-                            {csv}
-                          </td>
+                    {Object.entries(result.mapping).map(([csv, crm]) => (
+                      <tr key={csv} className="border-t">
+                        <td className="p-3">{csv}</td>
 
-                          <td className="p-3">
-                            <span
-                              className="
+                        <td className="p-3">
+                          <span
+                            className="
                                 inline-flex
                                 px-3
                                 py-1
@@ -224,13 +250,12 @@ function App() {
                                 text-sm
                                 font-medium
                               "
-                            >
-                              {crm || "-"}
-                            </span>
-                          </td>
-                        </tr>
-                      )
-                    )}
+                          >
+                            {crm || "-"}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>
@@ -254,7 +279,7 @@ function App() {
                     {result.imported.length}
                   </span>
 
-                  <h2 className="text-xl font-semibold">
+                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
                     Imported Records
                   </h2>
                 </div>
@@ -281,7 +306,7 @@ function App() {
                     {result.skipped.length}
                   </span>
 
-                  <h2 className="text-xl font-semibold">
+                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
                     Skipped Records
                   </h2>
                 </div>

@@ -6,10 +6,31 @@ function PreviewTable({ data }) {
   const headers = Object.keys(data[0]);
 
   return (
-    <div className="border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm">
+    <div
+      className="
+        border
+        border-gray-200
+        dark:border-gray-700
+        rounded-xl
+        overflow-hidden
+        bg-white
+        dark:bg-gray-800
+        shadow-sm
+      "
+    >
       <div className="overflow-auto max-h-100">
         <table className="w-full text-sm">
-          <thead className="sticky top-0 bg-gray-50 border-b">
+          <thead
+            className="
+              sticky
+              top-0
+              bg-gray-50
+              dark:bg-gray-700
+              border-b
+              border-gray-200
+              dark:border-gray-600
+            "
+          >
             <tr>
               {headers.map((header) => (
                 <th
@@ -20,6 +41,7 @@ function PreviewTable({ data }) {
                     text-left
                     font-semibold
                     text-gray-700
+                    dark:text-gray-200
                     whitespace-nowrap
                   "
                 >
@@ -33,7 +55,14 @@ function PreviewTable({ data }) {
             {data.map((row, index) => (
               <tr
                 key={index}
-                className="border-b last:border-b-0 hover:bg-gray-50"
+                className="
+                  border-b
+                  border-gray-200
+                  dark:border-gray-700
+                  last:border-b-0
+                  hover:bg-gray-50
+                  dark:hover:bg-gray-700/50
+                "
               >
                 {headers.map((header) => (
                   <td
@@ -42,6 +71,7 @@ function PreviewTable({ data }) {
                       px-4
                       py-3
                       text-gray-600
+                      dark:text-gray-300
                       whitespace-nowrap
                     "
                   >
