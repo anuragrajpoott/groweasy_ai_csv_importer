@@ -123,7 +123,7 @@ function App() {
                   {result.totalRows}
                 </p>
 
-                <pre>{JSON.stringify(result.preview, null, 2)}</pre>
+                <pre>{result.aiResponse}</pre>
               </div>
             )}
           </div>

@@ -1,5 +1,7 @@
 const Papa = require("papaparse");
 
+const { extractCRMData } = require("../services/ai.service");
+
 const importCSV = async (req, res) => {
   try {
     const file = req.file;
@@ -18,11 +20,14 @@ const importCSV = async (req, res) => {
       skipEmptyLines: true,
     });
 
-    return res.json({
-      success: true,
-      totalRows: parsed.data.length,
-      preview: parsed.data.slice(0, 5),
-    });
+    const aiResponse = await extractCRMData(
+  parsed.data.slice(0, 5)
+);
+
+return res.json({
+  success: true,
+  aiResponse,
+});
   } catch (error) {
     console.error(error);
 
