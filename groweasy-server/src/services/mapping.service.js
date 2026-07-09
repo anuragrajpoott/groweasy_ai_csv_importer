@@ -1,23 +1,15 @@
 const OpenAI = require("openai");
 
-
-
 const client = new OpenAI({
   baseURL: "https://openrouter.ai/api/v1",
   apiKey: process.env.OPENROUTER_API_KEY,
 });
 
-const extractCRMData = async (records) => {
+const getColumnMapping = async (headers) => {
   const prompt = `
-Convert these records to CRM format.
+You are a CRM field mapping engine.
 
-Skip records without email or phone.
-
-Return valid JSON only.
-
-Return ONLY an array of objects.
-
-Each object MUST use these fields:
+Map the given CSV headers to one of these CRM fields:
 
 created_at
 name
@@ -35,31 +27,37 @@ data_source
 possession_time
 description
 
-Do not create any other fields.
+Rules:
+- Return ONLY valid JSON.
+- Use null if no suitable mapping exists.
 
-Records:
-${JSON.stringify(records)}
+Example:
+
+{
+  "Full Name": "name",
+  "Phone Number": "mobile_without_country_code",
+  "Remarks": "crm_note"
+}
+
+Headers:
+${JSON.stringify(headers)}
 `;
 
   const response = await client.chat.completions.create({
     model: "google/gemini-2.5-flash",
     messages: [
       {
-        role: "system",
-        content: "You are a CRM extraction engine.",
-      },
-      {
         role: "user",
         content: prompt,
       },
     ],
     temperature: 0,
-    max_tokens: 2000,
+    max_tokens: 500,
   });
 
   return response.choices[0].message.content;
 };
 
 module.exports = {
-  extractCRMData,
+  getColumnMapping,
 };

@@ -110,6 +110,71 @@ function App() {
             </button>
 
             {result && (
+  <div
+    style={{
+      display: "flex",
+      gap: "20px",
+      marginTop: "20px",
+    }}
+  >
+    <div
+      style={{
+        padding: "15px",
+        border: "1px solid #ddd",
+        background: "#fff",
+      }}
+    >
+      <h3>Total Imported</h3>
+      <p>{result.totalImported}</p>
+    </div>
+
+    <div
+      style={{
+        padding: "15px",
+        border: "1px solid #ddd",
+        background: "#fff",
+      }}
+    >
+      <h3>Total Skipped</h3>
+      <p>{result.totalSkipped}</p>
+    </div>
+  </div>
+)}
+
+{result?.mapping && (
+  <>
+    <h2 style={{ marginTop: "30px" }}>
+      Detected Mapping
+    </h2>
+
+    <table
+      style={{
+        borderCollapse: "collapse",
+        width: "100%",
+      }}
+    >
+      <thead>
+        <tr>
+          <th>CSV Column</th>
+          <th>CRM Field</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {Object.entries(result.mapping).map(
+          ([csv, crm]) => (
+            <tr key={csv}>
+              <td>{csv}</td>
+              <td>{crm}</td>
+            </tr>
+          )
+        )}
+      </tbody>
+    </table>
+  </>
+)}
+
+            {result && (
               <div
                 style={{
                   marginTop: "30px",
@@ -129,11 +194,21 @@ function App() {
 
                 {result?.records?.length > 0 && (
                   <>
-                    <h2>Parsed Records</h2>
+                    <h2>Parsed Imported</h2>
 
-                    <ResultTable data={result.records} />
+                    <ResultTable data={result.imported} />
                   </>
                 )}
+
+                {result?.skipped?.length > 0 && (
+  <>
+    <h2>Skipped Records</h2>
+
+    <ResultTable
+      data={result.skipped}
+    />
+  </>
+)}
               </div>
             )}
           </div>
