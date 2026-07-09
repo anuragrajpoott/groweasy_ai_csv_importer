@@ -6,6 +6,8 @@ import PreviewTable from "./components/PreviewTable";
 
 import api from "./services/api";
 
+import ResultTable from "./components/ResultTable";
+
 function App() {
   const [result, setResult] = useState(null);
 
@@ -123,7 +125,15 @@ function App() {
                   {result.totalRows}
                 </p>
 
-                <pre>{result.aiResponse}</pre>
+                <pre>{JSON.stringify(result.records, null, 2)}</pre>
+
+                {result?.records?.length > 0 && (
+                  <>
+                    <h2>Parsed Records</h2>
+
+                    <ResultTable data={result.records} />
+                  </>
+                )}
               </div>
             )}
           </div>
