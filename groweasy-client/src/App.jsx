@@ -9,6 +9,9 @@ import ImportHeader from "./components/ImportHeader";
 
 import api from "./services/api";
 
+import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
+
 function App() {
   const [file, setFile] = useState(null);
   const [csvData, setCsvData] = useState([]);
@@ -77,6 +80,7 @@ function App() {
 
   return (
     <ImportCard>
+      <Navbar/>
       <ImportHeader />
 
       <div className="p-6">
@@ -317,6 +321,7 @@ function App() {
           </div>
         )}
       </div>
+      <Footer />
     </ImportCard>
   );
 }

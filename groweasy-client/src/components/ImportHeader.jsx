@@ -1,4 +1,4 @@
-import ThemeToggle from "./ThemeToggle";
+
 
 function ImportHeader() {
   return (
@@ -56,7 +56,7 @@ function ImportHeader() {
           </p>
         </div>
 
-        <ThemeToggle />
+        
       </div>
     </div>
   );
