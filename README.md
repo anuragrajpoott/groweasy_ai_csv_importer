@@ -497,19 +497,19 @@ Handles:
 
 ### Light Mode
 
-![image](https://github.com/user-attachments/readme-assets/light-mode-home)
+![image](https://github.com/anuragrajpoott/groweasy_ai_csv_importer/blob/main/readme-assets/light-mode-home.jpeg)
 
 ### Dark Mode
 
-![image](https://github.com/user-attachments/readme-assets/dark-mode-home)
+![image](https://github.com/anuragrajpoott/groweasy_ai_csv_importer/blob/main/readme-assets/dark-mode-home.jpeg)
 
 ### CSV Preview
 
-![image](https://github.com/user-attachments/readme-assets/upload-preview)
+![image](https://github.com/anuragrajpoott/groweasy_ai_csv_importer/blob/main/readme-assets/upload-preview.jpeg)
 
 ### Import Results
 
-![image](https://github.com/user-attachments/readme-assets/import-results)
+![image](https://github.com/anuragrajpoott/groweasy_ai_csv_importer/blob/main/readme-assets/import-results.jpeg)
 
 ---
 
