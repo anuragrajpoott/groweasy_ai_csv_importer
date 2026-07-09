@@ -3,32 +3,28 @@ import Papa from "papaparse";
 
 import UploadZone from "./components/UploadZone";
 import PreviewTable from "./components/PreviewTable";
+import ResultTable from "./components/ResultTable";
+import ImportCard from "./components/ImportCard";
+import ImportHeader from "./components/ImportHeader";
 
 import api from "./services/api";
 
-import ResultTable from "./components/ResultTable";
-
 function App() {
-  const [result, setResult] = useState(null);
-
   const [file, setFile] = useState(null);
   const [csvData, setCsvData] = useState([]);
-
+  const [result, setResult] = useState(null);
   const [isImporting, setIsImporting] = useState(false);
 
   const handleFileSelect = (selectedFile) => {
     setFile(selectedFile);
+    setResult(null);
 
     Papa.parse(selectedFile, {
       header: true,
       skipEmptyLines: true,
-
       complete: (results) => {
-        console.log(results.data);
-
         setCsvData(results.data);
       },
-
       error: (error) => {
         console.error(error);
       },
@@ -40,7 +36,6 @@ function App() {
       setIsImporting(true);
 
       const formData = new FormData();
-
       formData.append("file", file);
 
       const response = await api.post("/import", formData, {
@@ -50,8 +45,6 @@ function App() {
       });
 
       setResult(response.data);
-
-      console.log(response.data);
     } catch (error) {
       console.error(error);
       alert("Import failed");
@@ -60,161 +53,246 @@ function App() {
     }
   };
 
+  const handleCancel = () => {
+    setFile(null);
+    setCsvData([]);
+    setResult(null);
+  };
+
   return (
-    <div
-      style={{
-        maxWidth: "1200px",
-        margin: "50px auto",
-        padding: "20px",
-      }}
-    >
-      <h1>GrowEasy CSV Importer</h1>
+    <ImportCard>
+      <ImportHeader />
 
-      <div style={{ marginTop: "20px" }}>
-        <UploadZone onFileSelect={handleFileSelect} />
-      </div>
-
-      {file && (
-        <div style={{ marginTop: "20px" }}>
-          <strong>Selected File:</strong> {file.name}
-        </div>
-      )}
-
-      {csvData.length > 0 && (
-        <>
-          <h2 style={{ marginTop: "30px" }}>
-            CSV Preview ({csvData.length} rows)
-          </h2>
-
-          <PreviewTable data={csvData.slice(0, 20)} />
-
-          <div
-            style={{
-              marginTop: "20px",
-            }}
-          >
-            <button
-              onClick={handleImport}
-              disabled={isImporting}
-              style={{
-                padding: "12px 24px",
-                border: "none",
-                borderRadius: "8px",
-                background: "#2563eb",
-                color: "white",
-                cursor: "pointer",
-                fontSize: "16px",
-              }}
-            >
-              {isImporting ? "Processing..." : "Confirm Import"}
-            </button>
-
-            {result && (
-  <div
-    style={{
-      display: "flex",
-      gap: "20px",
-      marginTop: "20px",
-    }}
-  >
-    <div
-      style={{
-        padding: "15px",
-        border: "1px solid #ddd",
-        background: "#fff",
-      }}
-    >
-      <h3>Total Imported</h3>
-      <p>{result.totalImported}</p>
-    </div>
-
-    <div
-      style={{
-        padding: "15px",
-        border: "1px solid #ddd",
-        background: "#fff",
-      }}
-    >
-      <h3>Total Skipped</h3>
-      <p>{result.totalSkipped}</p>
-    </div>
-  </div>
-)}
-
-{result?.mapping && (
-  <>
-    <h2 style={{ marginTop: "30px" }}>
-      Detected Mapping
-    </h2>
-
-    <table
-      style={{
-        borderCollapse: "collapse",
-        width: "100%",
-      }}
-    >
-      <thead>
-        <tr>
-          <th>CSV Column</th>
-          <th>CRM Field</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        {Object.entries(result.mapping).map(
-          ([csv, crm]) => (
-            <tr key={csv}>
-              <td>{csv}</td>
-              <td>{crm}</td>
-            </tr>
-          )
+      <div className="p-6">
+        {/* Upload Area */}
+        {!file && (
+          <UploadZone onFileSelect={handleFileSelect} />
         )}
-      </tbody>
-    </table>
-  </>
-)}
 
-            {result && (
-              <div
-                style={{
-                  marginTop: "30px",
-                  padding: "20px",
-                  background: "white",
-                  border: "1px solid #ddd",
-                }}
+        {/* Selected File */}
+        {file && (
+          <div className="border rounded-xl p-4 bg-gray-50">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="font-semibold text-gray-800">
+                  {file.name}
+                </h3>
+
+                <p className="text-sm text-gray-500">
+                  {(file.size / 1024).toFixed(2)} KB
+                </p>
+              </div>
+
+              <button
+                onClick={handleCancel}
+                className="text-gray-400 hover:text-red-500 text-xl"
               >
-                <h3>Backend Response</h3>
+                ×
+              </button>
+            </div>
+          </div>
+        )}
 
-                <p>
-                  Total Rows:
-                  {result.totalRows}
+        {/* Preview */}
+        {csvData.length > 0 && (
+          <>
+            <div className="mt-6">
+              <h2 className="text-lg font-semibold mb-3">
+                CSV Preview ({csvData.length} rows)
+              </h2>
+
+              <PreviewTable data={csvData.slice(0, 10)} />
+            </div>
+
+            {/* Actions */}
+            <div className="flex justify-end gap-4 mt-6">
+              <button
+                onClick={handleCancel}
+                className="
+                  px-6
+                  py-3
+                  rounded-xl
+                  border
+                  border-gray-300
+                  bg-white
+                  hover:bg-gray-50
+                "
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={handleImport}
+                disabled={isImporting}
+                className="
+                  px-6
+                  py-3
+                  rounded-xl
+                  bg-orange-500
+                  text-white
+                  hover:bg-orange-600
+                  disabled:opacity-50
+                "
+              >
+                {isImporting
+                  ? "Processing..."
+                  : "Upload File"}
+              </button>
+            </div>
+          </>
+        )}
+
+        {/* Results */}
+        {result && (
+          <div className="mt-10 space-y-8">
+            {/* Success Banner */}
+            <div className="bg-green-50 border border-green-200 rounded-xl p-4">
+              <h3 className="font-semibold text-green-700">
+                Import Completed Successfully
+              </h3>
+
+              <p className="text-green-600 text-sm mt-1">
+                {result.totalImported} records imported successfully.
+              </p>
+            </div>
+
+            {/* Stats */}
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="bg-green-50 border border-green-200 rounded-xl p-5">
+                <p className="text-sm text-gray-500">
+                  Successfully Imported
                 </p>
 
-                <pre>{JSON.stringify(result.records, null, 2)}</pre>
+                <h2 className="text-4xl font-bold text-green-600 mt-2">
+                  {result.totalImported}
+                </h2>
+              </div>
 
-                {result?.records?.length > 0 && (
-                  <>
-                    <h2>Parsed Imported</h2>
+              <div className="bg-red-50 border border-red-200 rounded-xl p-5">
+                <p className="text-sm text-gray-500">
+                  Skipped Records
+                </p>
 
-                    <ResultTable data={result.imported} />
-                  </>
-                )}
+                <h2 className="text-4xl font-bold text-red-600 mt-2">
+                  {result.totalSkipped}
+                </h2>
+              </div>
+            </div>
 
-                {result?.skipped?.length > 0 && (
-  <>
-    <h2>Skipped Records</h2>
+            {/* Mapping */}
+            {result.mapping && (
+              <div className="bg-white border rounded-xl overflow-hidden">
+                <div className="px-5 py-4 border-b">
+                  <h2 className="font-semibold">
+                    Detected Field Mapping
+                  </h2>
+                </div>
 
-    <ResultTable
-      data={result.skipped}
-    />
-  </>
-)}
+                <table className="w-full">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="text-left p-3">
+                        CSV Column
+                      </th>
+
+                      <th className="text-left p-3">
+                        CRM Field
+                      </th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {Object.entries(result.mapping).map(
+                      ([csv, crm]) => (
+                        <tr
+                          key={csv}
+                          className="border-t"
+                        >
+                          <td className="p-3">
+                            {csv}
+                          </td>
+
+                          <td className="p-3">
+                            <span
+                              className="
+                                inline-flex
+                                px-3
+                                py-1
+                                rounded-full
+                                bg-orange-100
+                                text-orange-700
+                                text-sm
+                                font-medium
+                              "
+                            >
+                              {crm || "-"}
+                            </span>
+                          </td>
+                        </tr>
+                      )
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            {/* Imported Records */}
+            {result.imported?.length > 0 && (
+              <div>
+                <div className="flex items-center gap-2 mb-4">
+                  <span
+                    className="
+                      px-2
+                      py-1
+                      rounded-full
+                      bg-green-100
+                      text-green-700
+                      text-xs
+                      font-medium
+                    "
+                  >
+                    {result.imported.length}
+                  </span>
+
+                  <h2 className="text-xl font-semibold">
+                    Imported Records
+                  </h2>
+                </div>
+
+                <ResultTable data={result.imported} />
+              </div>
+            )}
+
+            {/* Skipped Records */}
+            {result.skipped?.length > 0 && (
+              <div>
+                <div className="flex items-center gap-2 mb-4">
+                  <span
+                    className="
+                      px-2
+                      py-1
+                      rounded-full
+                      bg-red-100
+                      text-red-700
+                      text-xs
+                      font-medium
+                    "
+                  >
+                    {result.skipped.length}
+                  </span>
+
+                  <h2 className="text-xl font-semibold">
+                    Skipped Records
+                  </h2>
+                </div>
+
+                <ResultTable data={result.skipped} />
               </div>
             )}
           </div>
-        </>
-      )}
-    </div>
+        )}
+      </div>
+    </ImportCard>
   );
 }
 
