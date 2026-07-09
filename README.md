@@ -384,10 +384,9 @@ Create:
 Add:
 
 ```env
-PORT=5000
 
 OPENROUTER_API_KEY=your_api_key
-OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
+
 ```
 
 Start backend:
@@ -517,15 +516,15 @@ Handles:
 
 Frontend:
 
-<YOUR_FRONTEND_URL>
+[<Client>](https://groweasy-ai-csv-importer-red.vercel.app/)
 
 Backend:
 
-<YOUR_BACKEND_URL>
+[<Server>](https://groweasy-ai-csv-importer-ni7u.onrender.com)
 
 GitHub Repository:
 
-<YOUR_GITHUB_REPOSITORY_URL>
+[<GitHub>](https://github.com/anuragrajpoott/groweasy_ai_csv_importer)
 
 ---
 
