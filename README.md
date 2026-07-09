@@ -497,19 +497,19 @@ Handles:
 
 ### Light Mode
 
-*Add screenshot here*
+![image](https://github.com/user-attachments/readme-assets/light-mode-home)
 
 ### Dark Mode
 
-*Add screenshot here*
+![image](https://github.com/user-attachments/readme-assets/dark-mode-home)
 
 ### CSV Preview
 
-*Add screenshot here*
+![image](https://github.com/user-attachments/readme-assets/upload-preview)
 
 ### Import Results
 
-*Add screenshot here*
+![image](https://github.com/user-attachments/readme-assets/import-results)
 
 ---
 
